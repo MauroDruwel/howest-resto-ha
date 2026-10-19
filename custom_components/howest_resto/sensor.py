@@ -41,7 +41,6 @@ async def async_setup_entry(
         [
             HowestRestoTodaySensor(coordinator, entry),
             HowestRestoTomorrowSensor(coordinator, entry),
-            HowestRestoWeeklySensor(coordinator, entry),
         ]
     )
 
@@ -111,6 +110,9 @@ class HowestRestoTodaySensor(HowestRestoBaseSensor):
         attrs: dict[str, Any] = {
             ATTR_CAMPUS: self.coordinator.campus_code,
             ATTR_CAMPUS_NAME: self.coordinator.campus_name,
+            ATTR_WEEK: self.coordinator.data.week
+            if self.coordinator.data
+            else "current",
         }
         today = self.coordinator.today_menu
         if today:
@@ -123,6 +125,17 @@ class HowestRestoTodaySensor(HowestRestoBaseSensor):
                     ATTR_ENGLISH_DISHES: today.english_dishes,
                 }
             )
+        if self.coordinator.data and self.coordinator.data.days:
+            attrs[ATTR_DAYS] = [
+                {
+                    ATTR_DATE: d.date,
+                    ATTR_DAY: d.day,
+                    ATTR_DISHES: d.all_raw_items or d.dutch_dishes,
+                    ATTR_DUTCH_DISHES: d.dutch_dishes,
+                    ATTR_ENGLISH_DISHES: d.english_dishes,
+                }
+                for d in self.coordinator.data.days
+            ]
         return attrs
 
 
@@ -166,52 +179,4 @@ class HowestRestoTomorrowSensor(HowestRestoBaseSensor):
                     ATTR_ENGLISH_DISHES: tomorrow.english_dishes,
                 }
             )
-        return attrs
-
-
-class HowestRestoWeeklySensor(HowestRestoBaseSensor):
-    """Sensor providing the weekly menu count and full week payload."""
-
-    _attr_translation_key = "weekly_menu"
-    _attr_icon = "mdi:calendar-week"
-
-    def __init__(
-        self,
-        coordinator: HowestRestoCoordinator,
-        entry: HowestRestoConfigEntry,
-    ) -> None:
-        """Initialize weekly sensor."""
-        super().__init__(coordinator, entry)
-        self._attr_unique_id = f"howest_resto_{coordinator.campus_code.lower()}_weekly"
-
-    @property
-    def native_value(self) -> str:
-        """Return number of days available in the week."""
-        if not self.coordinator.data or not self.coordinator.data.days:
-            return "No menu"
-        count = len(self.coordinator.data.days)
-        return f"{count} days"
-
-    @property
-    def extra_state_attributes(self) -> dict[str, Any]:
-        """Return entity specific state attributes."""
-        attrs: dict[str, Any] = {
-            ATTR_CAMPUS: self.coordinator.campus_code,
-            ATTR_CAMPUS_NAME: self.coordinator.campus_name,
-            ATTR_WEEK: self.coordinator.data.week
-            if self.coordinator.data
-            else "current",
-            ATTR_DAYS: [],
-        }
-        if self.coordinator.data and self.coordinator.data.days:
-            attrs[ATTR_DAYS] = [
-                {
-                    ATTR_DATE: d.date,
-                    ATTR_DAY: d.day,
-                    ATTR_DISHES: d.all_raw_items or d.dutch_dishes,
-                    ATTR_DUTCH_DISHES: d.dutch_dishes,
-                    ATTR_ENGLISH_DISHES: d.english_dishes,
-                }
-                for d in self.coordinator.data.days
-            ]
         return attrs

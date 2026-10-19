@@ -26,22 +26,20 @@ async def test_sensors_created(
     assert await hass.config_entries.async_setup(mock_config_entry.entry_id)
     await hass.async_block_till_done()
 
-    # Verify weekly sensor
-    weekly_state = hass.states.get("sensor.howest_resto_t_obeetje_weekly_menu")
-    assert weekly_state is not None
-    assert weekly_state.state == "5 days"
-    assert weekly_state.attributes["campus"] == "GKG"
-    assert weekly_state.attributes["campus_name"] == "'t Obeetje"
-    assert len(weekly_state.attributes["days"]) == 5
-
     # Verify today & tomorrow sensors exist
     today_state = hass.states.get("sensor.howest_resto_t_obeetje_today_s_menu")
     assert today_state is not None
-    assert "campus" in today_state.attributes
+    assert today_state.attributes["campus"] == "GKG"
+    assert today_state.attributes["campus_name"] == "'t Obeetje"
+    assert "days" in today_state.attributes
+    assert len(today_state.attributes["days"]) == 5
 
     tomorrow_state = hass.states.get("sensor.howest_resto_t_obeetje_tomorrow_s_menu")
     assert tomorrow_state is not None
-    assert "campus" in tomorrow_state.attributes
+    assert tomorrow_state.attributes["campus"] == "GKG"
+
+    # Verify redundant weekly sensor is removed
+    assert hass.states.get("sensor.howest_resto_t_obeetje_weekly_menu") is None
 
 
 async def test_sensor_english_language(
@@ -61,6 +59,6 @@ async def test_sensor_english_language(
     assert await hass.config_entries.async_setup(entry.entry_id)
     await hass.async_block_till_done()
 
-    weekly_state = hass.states.get("sensor.howest_resto_t_obeetje_weekly_menu")
-    assert weekly_state is not None
-    assert weekly_state.state == "5 days"
+    today_state = hass.states.get("sensor.howest_resto_t_obeetje_today_s_menu")
+    assert today_state is not None
+    assert "days" in today_state.attributes

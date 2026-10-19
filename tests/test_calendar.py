@@ -41,3 +41,34 @@ async def test_calendar_created_and_events(
     assert "Graaf Karel de Goedelaan 5, Kortrijk" in monday_event.location
     assert monday_event.start == datetime.date(2026, 10, 19)
     assert monday_event.end == datetime.date(2026, 10, 20)
+
+
+def test_parse_menu_date() -> None:
+    """Test date parsing logic for Dutch month names and various delimiters."""
+    from custom_components.howest_resto.calendar import _parse_menu_date
+
+    # Dutch text month without year
+    d1 = _parse_menu_date("19 oktober")
+    assert d1 is not None
+    assert d1.day == 19
+    assert d1.month == 10
+
+    # Dutch text month with explicit year
+    d2 = _parse_menu_date("23 oktober 2026")
+    assert d2 == datetime.date(2026, 10, 23)
+
+    # Short Dutch month abbreviation
+    d3 = _parse_menu_date("5 mrt 2026")
+    assert d3 == datetime.date(2026, 3, 5)
+
+    # Slashes
+    d4 = _parse_menu_date("19/10/2026")
+    assert d4 == datetime.date(2026, 10, 19)
+
+    # Hyphens
+    d5 = _parse_menu_date("2026-10-19")
+    assert d5 == datetime.date(2026, 10, 19)
+
+    # Invalid / empty
+    assert _parse_menu_date("") is None
+    assert _parse_menu_date("invalid date") is None
