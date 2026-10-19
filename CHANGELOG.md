@@ -2,6 +2,15 @@
 
 All notable changes to this project are documented here.
 
+## [1.0.1] - 2026-10-19
+
+### Added
+- Official vector Howest brand assets for integration icon and logo.
+
+### Changed
+- Clarified community/unofficial status in documentation.
+- Integrated `howest-resto` v1.0.0+ from official PyPI release.
+
 ## [1.0.0] - 2026-10-19
 
 ### Added
