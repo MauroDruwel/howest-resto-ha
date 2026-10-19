@@ -1,0 +1,6 @@
+{
+  "name": "Howest Resto",
+  "render_readme": true,
+  "homeassistant": "2024.11.0",
+  "min_ha_version": "2024.11.0"
+}

@@ -1,0 +1,15 @@
+# Reusable Home Assistant validation workflow executing hassfest and hacs/action
+name: Validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 4 * * 1"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    # Reusable workflow running home-assistant/actions/hassfest and hacs/action
+    uses: MauroDruwel/ha-quality-gate/.github/workflows/validate.yml@main

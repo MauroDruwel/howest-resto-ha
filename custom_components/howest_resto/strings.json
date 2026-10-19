@@ -1,0 +1,51 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Howest Resto",
+        "description": "Select the Howest campus restaurant you wish to monitor.",
+        "data": {
+          "campus": "Campus"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Failed to connect to Howest restaurant portal.",
+      "invalid_campus": "Selected campus was not recognized.",
+      "unknown": "Unexpected error occurred."
+    },
+    "abort": {
+      "already_configured": "This Howest campus restaurant is already configured."
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Howest Resto Options",
+        "description": "Configure update frequency and preferred menu display language.",
+        "data": {
+          "scan_interval": "Update interval (minutes)",
+          "language": "Preferred display language"
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "today_menu": {
+        "name": "Today's menu"
+      },
+      "tomorrow_menu": {
+        "name": "Tomorrow's menu"
+      },
+      "weekly_menu": {
+        "name": "Weekly menu"
+      }
+    },
+    "calendar": {
+      "menu_calendar": {
+        "name": "Menu calendar"
+      }
+    }
+  }
+}

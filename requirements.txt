@@ -1,0 +1,1 @@
+git+https://github.com/MauroDruwel/howest-resto.git@v1.0.0
