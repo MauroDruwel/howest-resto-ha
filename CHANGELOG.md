@@ -11,4 +11,4 @@ All notable changes to this project are documented here.
 - Options Flow with configurable update intervals and language preferences (Dutch, English, Both).
 - Today's Menu sensor, Tomorrow's Menu sensor, and Weekly Menu sensor with detailed attributes.
 - Native Calendar platform exposing daily lunches as all-day calendar events.
-- Zero external dependencies using official typed `howest-resto` Python library.
+- Zero external dependencies using typed `howest-resto` Python library.

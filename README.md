@@ -18,7 +18,7 @@ Exposes daily meals, weekly lunch schedules, and native calendar events for all 
 - **Weekly Menu Overview**: Access complete weekly dishes and daily breakdowns via attributes.
 - **Native Calendar Platform**: View menus directly in Home Assistant calendar cards and integrate with calendar automations.
 - **Language Preference**: Display dish titles in Dutch, English, or both via Integration Options.
-- **Zero Cloud Proxy**: Communicates directly with the official Howest restaurant system using the [`howest-resto`](https://github.com/MauroDruwel/howest-resto) Python library.
+- **Zero Cloud Proxy**: Communicates directly with the Howest restaurant portal using the [`howest-resto`](https://github.com/MauroDruwel/howest-resto) Python library.
 
 ---
 
