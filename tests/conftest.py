@@ -120,10 +120,70 @@ def sample_weekly_menu() -> WeeklyMenuResponse:
 
 
 @pytest.fixture
-def mock_client(sample_weekly_menu: WeeklyMenuResponse) -> Generator[AsyncMock]:
+def sample_next_weekly_menu() -> WeeklyMenuResponse:
+    """Return a realistic sample next weekly menu."""
+    days = [
+        DailyMenu(
+            date="26/10/2026",
+            day="Ma",
+            all_raw_items=["Spaghetti Bolognaise"],
+            dutch_dishes=["Spaghetti Bolognaise"],
+            english_dishes=["Spaghetti Bolognaise"],
+        ),
+        DailyMenu(
+            date="27/10/2026",
+            day="Di",
+            all_raw_items=["Gentse Waterzooi"],
+            dutch_dishes=["Gentse Waterzooi"],
+            english_dishes=["Ghent Waterzooi"],
+        ),
+        DailyMenu(
+            date="28/10/2026",
+            day="Wo",
+            all_raw_items=["Kip met Currysaus"],
+            dutch_dishes=["Kip met Currysaus"],
+            english_dishes=["Chicken Curry"],
+        ),
+        DailyMenu(
+            date="29/10/2026",
+            day="Do",
+            all_raw_items=["Toscaans Vleesbroodje"],
+            dutch_dishes=["Toscaans Vleesbroodje"],
+            english_dishes=["Tuscan Meatloaf"],
+        ),
+        DailyMenu(
+            date="30/10/2026",
+            day="Vr",
+            all_raw_items=["Kippenballetjes met Kokosroomsaus"],
+            dutch_dishes=["Kippenballetjes met Kokosroomsaus"],
+            english_dishes=["Chicken Meatballs in Coconut Cream"],
+        ),
+    ]
+    return WeeklyMenuResponse(
+        campus="GKG",
+        campus_name="'t Obeetje (Graaf Karel de Goedelaan 5, Kortrijk)",
+        week="next",
+        days=days,
+        fetched_at="2026-10-19T10:00:00+00:00",
+    )
+
+
+@pytest.fixture
+def mock_client(
+    sample_weekly_menu: WeeklyMenuResponse,
+    sample_next_weekly_menu: WeeklyMenuResponse,
+) -> Generator[AsyncMock]:
     """Patch AsyncHowestRestoClient across the integration."""
     client = AsyncMock()
-    client.get_menu.return_value = sample_weekly_menu
+
+    async def _mock_get_menu(
+        campus: str = "GKG", week: str = "current"
+    ) -> WeeklyMenuResponse:
+        if week == "next":
+            return sample_next_weekly_menu
+        return sample_weekly_menu
+
+    client.get_menu.side_effect = _mock_get_menu
 
     with (
         patch(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass, field
 from datetime import timedelta
 
 from homeassistant.config_entries import ConfigEntry
@@ -23,6 +24,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
 )
+from .helpers import parse_menu_date
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -37,7 +39,17 @@ DAY_MAP: dict[int, str] = {
 }
 
 
-class HowestRestoCoordinator(DataUpdateCoordinator[WeeklyMenuResponse]):
+@dataclass(slots=True)
+class HowestRestoData:
+    """Consolidated menu data for current and upcoming weeks."""
+
+    current_week: WeeklyMenuResponse
+    next_week: WeeklyMenuResponse | None = None
+    days: list[DailyMenu] = field(default_factory=list)
+    week: str = "current"
+
+
+class HowestRestoCoordinator(DataUpdateCoordinator[HowestRestoData]):
     """Class to manage fetching Howest Resto menu data."""
 
     config_entry: HowestRestoConfigEntry
@@ -83,14 +95,22 @@ class HowestRestoCoordinator(DataUpdateCoordinator[WeeklyMenuResponse]):
             return None
 
         target_dt = dt_util.now() + timedelta(days=day_offset)
+        target_date = target_dt.date()
         target_abbr = DAY_MAP.get(target_dt.isoweekday())
         if not target_abbr:
             return None
 
-        # Primary match by day abbreviation (Ma, Di, Wo, Do, Vr)
+        # 1. Primary match: exact parsed date
         for day_menu in self.data.days:
-            if day_menu.day == target_abbr:
+            parsed = parse_menu_date(day_menu.date)
+            if parsed == target_date:
                 return day_menu
+
+        # 2. Fallback: match day abbreviation in current week
+        if self.data.current_week and self.data.current_week.days:
+            for day_menu in self.data.current_week.days:
+                if day_menu.day == target_abbr:
+                    return day_menu
 
         return None
 
@@ -104,13 +124,36 @@ class HowestRestoCoordinator(DataUpdateCoordinator[WeeklyMenuResponse]):
         """Return tomorrow's menu if available."""
         return self.get_daily_menu_for_offset(1)
 
-    async def _async_update_data(self) -> WeeklyMenuResponse:
-        """Fetch weekly menu from Howest website."""
+    async def _async_update_data(self) -> HowestRestoData:
+        """Fetch weekly menu from Howest website for current and next week."""
         try:
-            return await self.client.get_menu(campus=self.campus_code)
+            current_week = await self.client.get_menu(
+                campus=self.campus_code, week="current"
+            )
         except CampusNotFoundError as err:
             raise ConfigEntryError(
                 f"Campus {self.campus_code} is not recognized by Howest: {err}"
             ) from err
         except APIError as err:
             raise UpdateFailed(f"Error fetching Howest menu: {err}") from err
+
+        next_week: WeeklyMenuResponse | None = None
+        try:
+            next_week = await self.client.get_menu(campus=self.campus_code, week="next")
+        except Exception as exc:
+            _LOGGER.debug(
+                "Could not fetch next week's menu for campus %s: %s",
+                self.campus_code,
+                exc,
+            )
+
+        all_days: list[DailyMenu] = list(current_week.days)
+        if next_week and next_week.days:
+            all_days.extend(next_week.days)
+
+        return HowestRestoData(
+            current_week=current_week,
+            next_week=next_week,
+            days=all_days,
+            week=current_week.week,
+        )

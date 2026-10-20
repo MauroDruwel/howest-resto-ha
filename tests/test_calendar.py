@@ -42,6 +42,14 @@ async def test_calendar_created_and_events(
     assert monday_event.start == datetime.date(2026, 10, 19)
     assert monday_event.end == datetime.date(2026, 10, 20)
 
+    # Verify next week events are also available in calendar
+    full_fortnight = dt_util.as_utc(datetime.datetime(2026, 10, 31, 23, 59, 59))
+    all_events = await calendar_entity.async_get_events(
+        hass, start_date, full_fortnight
+    )
+    assert len(all_events) == 10
+    assert "Spaghetti Bolognaise" in all_events[5].summary
+
 
 def test_parse_menu_date() -> None:
     """Test date parsing logic for Dutch month names and various delimiters."""

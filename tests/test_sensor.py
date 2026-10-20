@@ -33,6 +33,11 @@ async def test_sensors_created(
     assert today_state.attributes["campus_name"] == "'t Obeetje"
     assert "days" in today_state.attributes
     assert len(today_state.attributes["days"]) == 5
+    assert "next_week_days" in today_state.attributes
+    assert len(today_state.attributes["next_week_days"]) == 5
+    assert today_state.attributes["next_week_days"][0]["dishes"] == [
+        "Spaghetti Bolognaise"
+    ]
 
     tomorrow_state = hass.states.get("sensor.howest_resto_t_obeetje_tomorrow_s_menu")
     assert tomorrow_state is not None

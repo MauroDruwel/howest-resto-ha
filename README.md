@@ -66,14 +66,14 @@ Click **Configure** on the integration card to adjust:
 
 | Entity | Translation Key | Description |
 |---|---|---|
-| `sensor.howest_resto_<campus>_today_s_menu` | `today_menu` | Dishes served today (or `Closed` if weekend/no menu), includes full weekly schedule in `days` attribute |
+| `sensor.howest_resto_<campus>_today_s_menu` | `today_menu` | Dishes served today (or `Closed` if weekend/no menu), includes weekly schedule in `days` and next week in `next_week_days` |
 | `sensor.howest_resto_<campus>_tomorrow_s_menu` | `tomorrow_menu` | Dishes served tomorrow |
 
 ### Calendar
 
 | Entity | Description |
 |---|---|
-| `calendar.howest_resto_<campus>_menu_calendar` | Displays each day's lunch menu as an all-day calendar event with dish breakdowns |
+| `calendar.howest_resto_<campus>_menu_calendar` | Displays current and next week's lunch menus (up to 10 days ahead) as all-day calendar events with dish breakdowns |
 
 ---
 

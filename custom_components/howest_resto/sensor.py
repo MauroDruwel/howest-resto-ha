@@ -126,6 +126,11 @@ class HowestRestoTodaySensor(HowestRestoBaseSensor):
                 }
             )
         if self.coordinator.data and self.coordinator.data.days:
+            current_days = (
+                self.coordinator.data.current_week.days
+                if self.coordinator.data.current_week
+                else self.coordinator.data.days
+            )
             attrs[ATTR_DAYS] = [
                 {
                     ATTR_DATE: d.date,
@@ -134,8 +139,19 @@ class HowestRestoTodaySensor(HowestRestoBaseSensor):
                     ATTR_DUTCH_DISHES: d.dutch_dishes,
                     ATTR_ENGLISH_DISHES: d.english_dishes,
                 }
-                for d in self.coordinator.data.days
+                for d in current_days
             ]
+            if self.coordinator.data.next_week and self.coordinator.data.next_week.days:
+                attrs["next_week_days"] = [
+                    {
+                        ATTR_DATE: d.date,
+                        ATTR_DAY: d.day,
+                        ATTR_DISHES: d.all_raw_items or d.dutch_dishes,
+                        ATTR_DUTCH_DISHES: d.dutch_dishes,
+                        ATTR_ENGLISH_DISHES: d.english_dishes,
+                    }
+                    for d in self.coordinator.data.next_week.days
+                ]
         return attrs
 
 
